@@ -23,6 +23,53 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <!-- 3D Advanced Interactive Welcome Portal -->
+    <div id="welcome-portal">
+        <div class="portal-grid-bg"></div>
+        <div class="portal-sphere-glow portal-sphere-1"></div>
+        <div class="portal-sphere-glow portal-sphere-2"></div>
+        
+        <div class="portal-card animate-portal-load">
+            <div class="portal-header">
+                <i data-lucide="shield-check" class="portal-logo neon-text-blue"></i>
+                <div class="portal-title-block">
+                    <h1 class="neon-text-blue font-mono">EAOS // CORE_OS</h1>
+                    <p class="font-mono">ENTERPRISE DATA ANALYTICS OPERATING SYSTEM</p>
+                </div>
+            </div>
+            
+            <div class="portal-status-grid">
+                <div class="portal-status-item">
+                    <span class="status-label">SQLite Kernel</span>
+                    <span class="status-value positive font-mono"><span class="mini-pulse"></span> ONLINE</span>
+                </div>
+                <div class="portal-status-item">
+                    <span class="status-label">Python WASM VM</span>
+                    <span class="status-value positive font-mono"><span class="mini-pulse"></span> READY</span>
+                </div>
+                <div class="portal-status-item">
+                    <span class="status-label">Gemini AI Model</span>
+                    <span class="status-value positive font-mono"><span class="mini-pulse"></span> SECURED</span>
+                </div>
+                <div class="portal-status-item">
+                    <span class="status-label">System Canvas</span>
+                    <span class="status-value positive font-mono"><span class="mini-pulse"></span> 16:9_LOCK</span>
+                </div>
+            </div>
+
+            <div class="portal-actions">
+                <button class="btn btn-primary btn-portal-launch font-mono" onclick="launchSystemMatrix()">
+                    <i data-lucide="play" style="width:16px;height:16px;"></i> LAUNCH SYSTEM MATRIX
+                </button>
+            </div>
+            
+            <div class="portal-footer">
+                <span class="font-mono text-muted">SECURE CONNECTION ESTABLISHED // PORT 443</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Application -->
     <div class="background-grid"></div>
     <div class="neon-glow-sphere sphere-1"></div>
     <div class="neon-glow-sphere sphere-2"></div>

@@ -1155,3 +1155,13 @@ Answer the user's question based on this data. Highlight patterns, anomalies, an
         lastMsgNode.innerHTML = `<p style="font-size: 0.85rem; line-height: 1.5; color: #f87171;">Error: ${errorMsg}</p>`;
     });
 }
+
+function launchSystemMatrix() {
+    const portal = document.getElementById('welcome-portal');
+    if (portal) {
+        portal.classList.add('fade-out');
+        setTimeout(() => {
+            portal.remove();
+        }, 600);
+    }
+}
