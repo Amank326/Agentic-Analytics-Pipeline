@@ -35,7 +35,7 @@ let GEMINI_API_KEY = "";
 
 // Tab Routing Configuration
 const tabMeta = {
-    'overview': { title: 'Enterprise Analytics Overview', subtitle: 'Real-time metrics, data cleaning, and relational SQL queries' },
+    'overview': { title: 'DataSphere AI Overview', subtitle: 'Real-time metrics, data cleaning, and relational SQL queries' },
     'cleaning': { title: 'Cleaning & Quality Assurance', subtitle: 'Detailed ingestion records, anomaly flags, and data engineering transformations' },
     'etl': { title: 'No-Code ETL Studio', subtitle: 'Visual workflow designer to build, connect, and verify ingestion pipelines' },
     'eda': { title: 'Interactive Exploratory Data Analysis', subtitle: 'Dynamic visual graphics powered by Apache ECharts' },
