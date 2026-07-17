@@ -1,0 +1,6 @@
+.firebase/
+scratch/
+SalesDB.db
+.DS_Store
+public/config.json
+config.json

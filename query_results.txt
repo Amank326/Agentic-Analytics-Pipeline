@@ -1,0 +1,31 @@
+=== Query 1: Category & Sub-Category Margin Report ===
+       category sub_category  total_sales  total_profit  profit_margin_percent
+Office Supplies          Art  3275.801270    860.286647              26.261869
+      Furniture       Chairs  2634.395683   -179.968324              -6.831484
+     Technology  Accessories  2092.666031    394.279512              18.841015
+      Furniture       Tables  1703.578909    358.224130              21.027739
+      Furniture    Bookcases  1668.116008    153.491540               9.201491
+     Technology       Phones  1625.730555    337.764357              20.776158
+     Technology      Copiers  1595.162658    285.191276              17.878508
+Office Supplies      Binders  1470.401212    300.672556              20.448334
+Office Supplies        Paper  1161.141399    200.690559              17.283904
+
+=== Query 2: Monthly Performance Growth Trends ===
+sales_month  total_sales  total_profit  total_orders
+    2026-01  9274.029915   1381.695892            31
+    2026-02  6559.098481   1087.591383            28
+    2026-03  1393.865328    241.344979             6
+
+=== Query 3: Customer Performance Ranking (Advanced Window) ===
+customer_name  total_sales  total_profit  profitability_rank
+   Customer_1  1801.268789    346.552563                   1
+   Customer_3  1668.951416    336.671832                   2
+  Customer_16  1215.323829    281.736068                   3
+   Customer_5  1578.873983    260.542503                   4
+   Customer_4  1344.440677    243.808092                   5
+  Customer_10   917.943738    207.460000                   6
+  Customer_19   923.857786    185.856457                   7
+  Customer_14   816.718739    163.131568                   8
+  Customer_15   665.721211    133.440406                   9
+   Customer_8   574.721008    112.302770                  10
+

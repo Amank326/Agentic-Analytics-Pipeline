@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise AI Analytics Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- External Analytics Engine CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.12.0/sql-wasm.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="background-grid"></div>
+    <div class="neon-glow-sphere sphere-1"></div>
+    <div class="neon-glow-sphere sphere-2"></div>
+
+    <div class="dashboard-viewport">
+        <div class="dashboard-container">
+            <!-- Sidebar Navigation -->
+            <aside class="sidebar">
+                <div class="sidebar-brand">
+                    <i data-lucide="shield-check" class="brand-icon neon-text-blue"></i>
+                    <div class="brand-text">
+                        <h2 class="neon-text-blue">PLATFORM_AI</h2>
+                        <span>ENTERPRISE HUB</span>
+                    </div>
+                </div>
+                <nav class="sidebar-menu">
+                    <button class="menu-item active" onclick="switchTab('overview', this)">
+                        <i data-lucide="layout-dashboard"></i> <span>Overview</span>
+                    </button>
+                    <button class="menu-item" onclick="switchTab('cleaning', this)">
+                        <i data-lucide="sparkles"></i> <span>Cleaning & Quality</span>
+                    </button>
+                    <button class="menu-item" onclick="switchTab('eda', this)">
+                        <i data-lucide="bar-chart-2"></i> <span>Interactive EDA</span>
+                    </button>
+                    <button class="menu-item" onclick="switchTab('sql', this)">
+                        <i data-lucide="terminal"></i> <span>SQL Playground</span>
+                    </button>
+                    <button class="menu-item" onclick="switchTab('powerbi', this)">
+                        <i data-lucide="box"></i> <span>Power BI Specs</span>
+                    </button>
+                    <button class="menu-item" onclick="switchTab('ai-copilot', this)">
+                        <i data-lucide="message-square"></i> <span>AI Copilot</span>
+                    </button>
+                    <button class="menu-item" onclick="switchTab('downloads', this)">
+                        <i data-lucide="download"></i> <span>Data Hub</span>
+                    </button>
+                </nav>
+                <div class="sidebar-footer">
+                    <div class="status-indicator">
+                        <span class="pulse"></span>
+                        <span class="status-text font-mono" id="db-status-label">SQL_DB: IN_MEMORY</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Header -->
+                <header class="main-header">
+                    <div class="header-title">
+                        <h1 id="dashboard-title" class="neon-text-blue">Enterprise Analytics Overview</h1>
+                        <p id="dashboard-subtitle">Real-time metrics, data cleaning, and relational SQL queries</p>
+                    </div>
+                    <div class="header-actions">
+                        <input type="file" id="file-uploader" accept=".csv,.xlsx,.xls,.json,.xml,.tsv,.txt,.db,.sqlite" style="display: none;" onchange="handleFileUpload(event)">
+                        <button class="btn btn-secondary" onclick="document.getElementById('file-uploader').click()">
+                            <i data-lucide="upload-cloud"></i> Ingest Dataset
+                        </button>
+                        <button class="btn btn-primary" onclick="resetFilters()">
+                            <i data-lucide="rotate-ccw"></i> Reset Filters
+                        </button>
+                    </div>
+                </header>
+
+                <!-- TAB: OVERVIEW -->
+                <div id="tab-overview" class="tab-content active">
+                    <!-- KPI Summary Cards -->
+                    <section class="kpi-grid">
+                        <div class="kpi-card sales-border" data-margin-color="sales">
+                            <div class="kpi-icon sales-theme">
+                                <i data-lucide="dollar-sign"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <h3>Total Sales</h3>
+                                <p id="kpi-sales" class="font-mono">$0.00</p>
+                                <span class="kpi-trend positive"><i data-lucide="trending-up"></i> Target Met</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card profit-border" data-margin-color="profit">
+                            <div class="kpi-icon profit-theme">
+                                <i data-lucide="wallet"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <h3>Total Profit</h3>
+                                <p id="kpi-profit" class="font-mono">$0.00</p>
+                                <span class="kpi-trend positive"><i data-lucide="trending-up"></i> Healthy Profit</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card margin-border" data-margin-color="margin">
+                            <div class="kpi-icon margin-theme">
+                                <i data-lucide="percent"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <h3>Profit Margin</h3>
+                                <p id="kpi-margin" class="font-mono">0.00%</p>
+                                <span class="kpi-trend neutral"><i data-lucide="activity"></i> Standard Margin</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card quantity-border" data-margin-color="quantity">
+                            <div class="kpi-icon quantity-theme">
+                                <i data-lucide="shopping-bag"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <h3>Total Quantity</h3>
+                                <p id="kpi-quantity" class="font-mono">0</p>
+                                <span class="kpi-trend positive"><i data-lucide="check-circle"></i> High Volume</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Filters Panel -->
+                    <section class="filters-container">
+                        <div class="search-box">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="search-input" placeholder="Search customer name...">
+                        </div>
+                        <div class="filter-controls">
+                            <div class="filter-group">
+                                <label for="filter-category">Category</label>
+                                <select id="filter-category" onchange="filterData()">
+                                    <option value="All">All Categories</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-region">Region</label>
+                                <select id="filter-region" onchange="filterData()">
+                                    <option value="All">All Regions</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-secondary" onclick="resetFilters()">Clear</button>
+                        </div>
+                    </section>
+
+                    <!-- Data Table Section -->
+                    <section class="content-card">
+                        <div class="card-header">
+                            <h2>Processed Store Records</h2>
+                            <span class="badge font-mono" id="record-count">0 Records</span>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead id="table-head-row">
+                                    <tr>
+                                        <th onclick="sortData('order_id')">Order ID <i data-lucide="chevrons-up-down"></i></th>
+                                        <th onclick="sortData('order_date')">Date <i data-lucide="chevrons-up-down"></i></th>
+                                        <th onclick="sortData('customer_name')">Customer <i data-lucide="chevrons-up-down"></i></th>
+                                        <th onclick="sortData('category')">Category <i data-lucide="chevrons-up-down"></i></th>
+                                        <th onclick="sortData('sub_category')">Sub-Category <i data-lucide="chevrons-up-down"></i></th>
+                                        <th onclick="sortData('sales')">Sales <i data-lucide="chevrons-up-down"></i></th>
+                                        <th onclick="sortData('profit')">Profit <i data-lucide="chevrons-up-down"></i></th>
+                                        <th onclick="sortData('quantity')">Qty <i data-lucide="chevrons-up-down"></i></th>
+                                        <th onclick="sortData('region')">Region <i data-lucide="chevrons-up-down"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- TAB: CLEANING & QUALITY -->
+                <div id="tab-cleaning" class="tab-content">
+                    <div class="split-section animate-fade">
+                        <section class="content-card">
+                            <div class="card-header">
+                                <h2>Ingestion & Quality Assessment</h2>
+                            </div>
+                            <div class="quality-score-container" style="display: flex; gap: 2rem; align-items: center; margin-bottom: 1.5rem;">
+                                <div class="score-circle" style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--profit-color); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                    <span style="font-size: 1.75rem; font-weight: 800;" id="quality-score-value">100%</span>
+                                    <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase;">Quality</span>
+                                </div>
+                                <div>
+                                    <h4 style="margin-bottom: 0.25rem;">Dataset Classification</h4>
+                                    <p style="color: var(--profit-color); font-weight: 700; font-size: 1rem; text-transform: uppercase;" id="dataset-classification-tag">RETAIL STORE SALES</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;" id="cleaning-meta-rows">Clean rows processed: 65</p>
+                                </div>
+                            </div>
+                            <div class="quality-metrics">
+                                <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+                                    <li style="display: flex; justify-content: space-between;"><span style="color: var(--text-primary);"><i data-lucide="check" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; color: var(--profit-color);"></i> Duplicates Removed</span> <strong id="metrics-duplicates">0</strong></li>
+                                    <li style="display: flex; justify-content: space-between;"><span style="color: var(--text-primary);"><i data-lucide="check" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; color: var(--profit-color);"></i> Null/Missing Fields Repaired</span> <strong id="metrics-nulls">0</strong></li>
+                                    <li style="display: flex; justify-content: space-between;"><span style="color: var(--text-primary);"><i data-lucide="check" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; color: var(--profit-color);"></i> Formats Standardized</span> <strong id="metrics-formats">0</strong></li>
+                                    <li style="display: flex; justify-content: space-between;"><span style="color: var(--text-primary);"><i data-lucide="check" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; color: var(--profit-color);"></i> Outliers Flagged</span> <strong id="metrics-outliers">0</strong></li>
+                                </ul>
+                            </div>
+                        </section>
+
+                        <section class="content-card">
+                            <div class="card-header">
+                                <h2>Automated Feature Engineering</h2>
+                            </div>
+                            <div class="feature-engineering-list">
+                                <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.85rem; color: var(--text-secondary);">
+                                    <li>
+                                        <h4 style="color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.15rem;"><i data-lucide="calendar" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; color: var(--accent-color); margin-right: 4px;"></i> Date Deconstruction</h4>
+                                        <p>Extracts Month, Year, Quarter, Week, and Season from order dates automatically.</p>
+                                    </li>
+                                    <li>
+                                        <h4 style="color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.15rem;"><i data-lucide="user-check" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; color: var(--accent-color); margin-right: 4px;"></i> Customer RFM Segments</h4>
+                                        <p>Calculates Recency, Frequency, and Monetary scores to generate customer loyalty bands.</p>
+                                    </li>
+                                    <li>
+                                        <h4 style="color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.15rem;"><i data-lucide="activity" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; color: var(--accent-color); margin-right: 4px;"></i> Outliers & Margin Bands</h4>
+                                        <p>Applies standard deviation thresholds to detect profit/sales outlier transactions.</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- TAB: INTERACTIVE EDA -->
+                <div id="tab-eda" class="tab-content">
+                    <section class="charts-gallery animate-fade">
+                        <!-- Chart 1: Dynamic ECharts visualizer -->
+                        <div class="content-card chart-card">
+                            <div class="card-header">
+                                <h2>Interactive Financial Performance (Apache ECharts)</h2>
+                                <span class="badge">Dynamic</span>
+                            </div>
+                            <div class="visual-container" id="echarts-dynamic-chart" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                                <!-- Chart rendered here -->
+                            </div>
+                            <p class="chart-desc">Interactive sales vs profit scatter visualizer populated dynamically from the current dataset, supporting live zoom, filtering, and detail tooltips.</p>
+                        </div>
+
+                        <!-- Chart 2: ECharts Category Distribution -->
+                        <div class="content-card chart-card">
+                            <div class="card-header">
+                                <h2>Sales & Profit by Sub-Category</h2>
+                                <span class="badge">Dynamic</span>
+                            </div>
+                            <div class="visual-container" id="echarts-subcat-chart" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                                <!-- Chart rendered here -->
+                            </div>
+                            <p class="chart-desc">Dynamic dual-axis chart plotting total revenue and absolute profitability margins per sub-category class.</p>
+                        </div>
+
+                        <!-- Chart 3: Regional share pie chart -->
+                        <div class="content-card chart-card">
+                            <div class="card-header">
+                                <h2>Geographical Market Contribution</h2>
+                                <span class="badge">Dynamic</span>
+                            </div>
+                            <div class="visual-container" id="echarts-region-chart" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                                <!-- Chart rendered here -->
+                            </div>
+                            <p class="chart-desc">Geographical pie contribution visual displaying sales distribution across regions.</p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- TAB: SQL PLAYGROUND -->
+                <div id="tab-sql" class="tab-content">
+                    <div class="split-section animate-fade" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <!-- SQL Editor -->
+                        <section class="content-card" style="display: flex; flex-direction: column; min-height: 480px;">
+                            <div class="card-header">
+                                <h2>In-Browser SQL playground</h2>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button class="btn btn-secondary" onclick="executeSQLPlayground()">Run Query</button>
+                                </div>
+                            </div>
+                            <div class="sql-input-area" style="flex-grow: 1; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+                                <textarea id="sql-query-editor" style="width: 100%; flex-grow: 1; min-height: 200px; background: #05080e; border: 1px solid var(--border-color); border-radius: 8px; color: #a5b4fc; padding: 1rem; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; outline: none; resize: none;">-- Write custom SELECT queries against store_sales table
+SELECT 
+    category,
+    SUM(sales) as total_sales,
+    SUM(profit) as total_profit
+FROM store_sales
+GROUP BY category
+ORDER BY total_sales DESC;</textarea>
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                Database: <strong>store_sales</strong> table contains the columns: <code>order_id</code>, <code>order_date</code>, <code>customer_name</code>, <code>category</code>, <code>sub_category</code>, <code>sales</code>, <code>profit</code>, <code>quantity</code>, <code>region</code>.
+                            </div>
+                        </section>
+
+                        <!-- Query Results Table -->
+                        <section class="content-card" style="display: flex; flex-direction: column; min-height: 480px;">
+                            <div class="card-header">
+                                <h2>Playground Query Execution Results</h2>
+                                <span class="badge" id="playground-results-count">0 Rows Returned</span>
+                            </div>
+                            <div class="table-wrapper" style="flex-grow: 1; background: rgba(0,0,0,0.15);">
+                                <table style="width: 100%;">
+                                    <thead id="playground-table-head">
+                                        <tr>
+                                            <th>Column Headers</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="playground-table-body">
+                                        <tr>
+                                            <td style="color: var(--text-secondary); text-align: center;">Execute a query on the left editor to display results here.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- TAB: POWER BI SPECS -->
+                <div id="tab-powerbi" class="tab-content">
+                    <section class="powerbi-grid animate-fade">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h2>Data Integration Specifications</h2>
+                            </div>
+                            <div class="step-list">
+                                <div class="step-item">
+                                    <span class="step-number">1</span>
+                                    <div>
+                                        <h4>Connect Data Source</h4>
+                                        <p>Open Power BI Desktop. Select **Get Data** -> **Text/CSV** and select the generated <code>cleaned_store_sales.csv</code>, or choose **MySQL database** and connect to your schema.</p>
+                                    </div>
+                                </div>
+                                <div class="step-item">
+                                    <span class="step-number">2</span>
+                                    <div>
+                                        <h4>Configure Key Measures (DAX)</h4>
+                                        <p>Click **New Measure** and write these analytics expressions:</p>
+                                        <pre><code class="language-dax">Total Sales = SUM(store_sales[sales])
+Total Profit = SUM(store_sales[profit])
+Profit Margin = DIVIDE([Total Profit], [Total Sales], 0)
+Total Quantity = SUM(store_sales[quantity])</code></pre>
+                                    </div>
+                                </div>
+                                <div class="step-item">
+                                    <span class="step-number">3</span>
+                                    <div>
+                                        <h4>Establish Dashboard Visuals</h4>
+                                        <p>Drag and drop the following visualizations onto a 16:9 canvas:</p>
+                                        <ul>
+                                            <li><strong>KPI Cards</strong>: Display Total Sales, Total Profit, and Profit Margin.</li>
+                                            <li><strong>Double-Axis Combo Chart</strong>: Sales and Profit by Category and Sub-category.</li>
+                                            <li><strong>Interactive Scatter Plot</strong>: Sales (X) vs. Profit (Y) grouped by Customer.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- TAB: AI COPILOT -->
+                <div id="tab-ai-copilot" class="tab-content">
+                    <div class="chat-tab-wrapper animate-fade" style="display: flex; justify-content: center; width: 100%;">
+                        <!-- Chat Container -->
+                        <section class="content-card chat-card-container" style="display: flex; flex-direction: column; min-height: 520px; max-width: 900px; width: 100%;">
+                            <div class="card-header">
+                                <h2>AI Sales Copilot</h2>
+                                <div class="copilot-status">
+                                    <span class="pulse"></span>
+                                    <span class="status-text font-mono">SYS_AI: CONNECTED</span>
+                                </div>
+                            </div>
+                            <div class="chat-messages" id="chat-messages">
+                                <div class="message system-message">
+                                    <p>Hello! I am your AI Sales Copilot. I have access to your sales dataset. If you upload a custom CSV/JSON, I will automatically study your new file! Ask me any question about your data.</p>
+                                </div>
+                            </div>
+                            <div class="chat-suggestions">
+                                <button class="btn btn-secondary" onclick="sendSuggestion('Which category has the highest sales and profit margin?')">Highest Margin Category?</button>
+                                <button class="btn btn-secondary" onclick="sendSuggestion('Identify any unprofitable customer transactions or sub-category losses')">Unprofitable transactions?</button>
+                                <button class="btn btn-secondary" onclick="sendSuggestion('Give me a brief summary of the monthly sales and profit growth trends')">Monthly growth trend?</button>
+                            </div>
+                            <div class="chat-input-area">
+                                <input type="text" id="chat-input" placeholder="Ask AI Copilot (e.g. what region is best?)..." onkeypress="handleChatKey(event)">
+                                <button class="btn btn-primary" onclick="sendChatMessage()">
+                                    <i data-lucide="send"></i>
+                                </button>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- TAB: DOWNLOADS -->
+                <div id="tab-downloads" class="tab-content">
+                    <section class="downloads-container animate-fade">
+                        <div class="content-card download-card">
+                            <div class="download-icon">
+                                <i data-lucide="file-spreadsheet" class="excel-icon"></i>
+                            </div>
+                            <h3>Cleaned Dataset (Excel format)</h3>
+                            <p>Fully formatted multi-sheet Excel spreadsheet with auto-adjust columns, financial currency formats, and built-in summary KPI formulas (SUM, AVERAGE, SUMIF).</p>
+                            <a href="cleaned_store_sales.xlsx" class="btn btn-primary" download>
+                                <i data-lucide="download"></i> Download Excel (.xlsx)
+                            </a>
+                        </div>
+
+                        <div class="content-card download-card">
+                            <div class="download-icon">
+                                <i data-lucide="file-text" class="csv-icon"></i>
+                            </div>
+                            <h3>Cleaned Dataset (CSV format)</h3>
+                            <p>Standardized raw comma-separated value database file containing 60+ cleaned rows, stripped of currency symbols and duplicates, ready to import to Power BI.</p>
+                            <a href="cleaned_store_sales.csv" class="btn btn-secondary" download>
+                                <i data-lucide="download"></i> Download CSV (.csv)
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
