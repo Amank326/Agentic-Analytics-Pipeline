@@ -1,69 +1,62 @@
-# Agentic Data Analytics Pipeline
+# 🌌 EAOS: Enterprise Analytics Operating System
+> **3D Cinematic Data Engine & In-Browser Python-WASM Sandbox**
 
-An end-to-end data analytics and business intelligence pipeline that generates synthetic sales data, cleans and processes it, stores it in an SQLite database, runs complex analytical queries, and generates financial visualizations.
-
----
-
-## 🚀 Project Overview
-
-This repository contains all the assets required for a complete sales performance analysis. It showcases:
-1. **Data Ingestion & Cleaning**: Python script utilizing `pandas` and `numpy` to generate synthetic data, drop duplicate records, clean currency symbols, and enforce correct datatypes.
-2. **Database Management**: Creation of a structured schema and loading the cleaned records into a relational database.
-3. **Business Intelligence (SQL)**: Querying the database to extract insights on category margins, monthly sales trends, and high-value customers.
-4. **Data Visualization**: A visual scatter plot identifying financial outliers and sales vs. profit correlations.
-5. **Power BI Blueprint**: Visual specifications and dashboard designs to consume this pipeline's output.
+<div align="center">
+  <img src="sales_vs_profit_outliers.png" width="800" alt="EAOS Analytics Banner" style="border-radius: 16px; box-shadow: 0 20px 50px rgba(99, 102, 241, 0.25); border: 1px solid rgba(255,255,255,0.1);"/>
+</div>
 
 ---
 
-## 📁 Repository Structure
+## ⚡ System Highlights
+- **🚀 WebAssembly SQLite Kernel**: Zero-latency relational queries executed directly in the browser's sandbox.
+- **🐍 Pyodide Python Console**: Run full Pandas & NumPy computations client-side (no backend required!).
+- **🤖 AutoML Regression Engine**: Train linear and Ridge estimators inside the WASM workspace.
+- **✨ Glassmorphic UI/UX**: Ultra-responsive layout engineered with custom CSS Grid matrices.
+- **🛡️ Google Gemini Copilot**: AI-driven transaction analysis and financial anomalies detection.
 
-```text
-├── SalesDB.db                   # Auto-generated SQLite Database containing store_sales
-├── cleaned_store_sales.csv      # Cleaned and processed dataset (CSV)
-├── database_schema.sql          # MySQL DDL & queries for enterprise deployment
-├── project_report.md            # Detailed analytics specifications & Power BI blueprint
-├── query_results.txt            # Outputs from the SQL analytical queries
-├── run_pipeline.bat             # One-click execution batch script (Windows)
-├── sales_agent_pipeline.py      # Core Python data generation, cleaning & query script
-└── sales_vs_profit_outliers.png # Scatter plot analyzing sales, profit, and outliers
+---
+
+## 🏗️ Architectural Topology
+
+```mermaid
+graph TD
+    A[Data Ingestion: CSV/JSON/Excel/SQLite] --> B[WASM Parsing Kernels]
+    B --> C[In-Memory SQL.js DB Engine]
+    B --> D[Pyodide Python WASM VM]
+    C --> E[ECharts Dashboard Visualizer]
+    D --> F[AutoML Regression Studio]
+    D --> G[Interactive Python Notebook]
+    E --> H[BI Worksheet Designer]
+    F --> I[Gemini 1.5 Copilot Chatbot]
+    G --> I
 ```
 
 ---
 
-## ⚙️ How to Run the Pipeline
+## 💻 Console Launch sequence
 
-### Option 1: One-Click Execution (Windows)
-Double-click `run_pipeline.bat`. This script will:
-1. Automatically verify and install missing Python packages (`pandas`, `numpy`, `seaborn`, `matplotlib`).
-2. Run `sales_agent_pipeline.py`.
-3. Generate the SQLite database, CSV file, query results, and the visualization plot.
+```bash
+# 1. Initialize local server environment
+python -m http.server 8000
 
-### Option 2: Command Line
-Ensure you have the required packages installed:
-```bash
-pip install pandas numpy seaborn matplotlib
-```
-Then, execute the main script:
-```bash
+# 2. Compile database pipeline & queries
 python sales_agent_pipeline.py
+
+# 3. Access the holographic matrix
+# Open browser at: http://localhost:8000
 ```
 
 ---
 
-## 📊 Analytical Insights (SQL Query Results Summary)
+## 📁 Holographic Blueprint Map
 
-The following three queries are executed automatically on database creation:
-
-### 1. Product Segment Analysis
-Categorizes and lists sales and profit metrics to identify the most profitable product sub-categories (e.g., Paper and Accessories demonstrate the highest profit margins, while Binders and Phones show margins below breakeven).
-
-### 2. Temporal Sales Performance Trend
-Groups sales figures and total order counts by Year-Month to evaluate monthly sales growth trends.
-
-### 3. Top Customer Segment
-Ranks the top 5 customers by net profit contributions, aiding target-marketing campaigns.
+- 🖥️ [public/index.html](file:///c:/Users/amank/OneDrive/Desktop/Agentic%20Data%20Analytics%20Pipeline/public/index.html) — Layout structure, CDNs, and UI grid modules.
+- 🎨 [public/style.css](file:///c:/Users/amank/OneDrive/Desktop/Agentic%20Data%20Analytics%20Pipeline/public/style.css) — Mobile-first glassmorphism styling, glowing radial meshes.
+- ⚙️ [public/app.js](file:///c:/Users/amank/OneDrive/Desktop/Agentic%20Data%20Analytics%20Pipeline/public/app.js) — Pyodide, SQL.js, AutoML, ECharts, and Gemini API bindings.
+- 🐍 [sales_agent_pipeline.py](file:///c:/Users/amank/OneDrive/Desktop/Agentic%20Data%20Analytics%20Pipeline/sales_agent_pipeline.py) — Synthetic data cleaning, normalization, and database compilation.
 
 ---
 
-## 🎨 Visualization Chart
-The scatter plot `sales_vs_profit_outliers.png` groups products by category, correlates order quantities, and outlines outliers with reference lines for high sales volume and net-loss margins.
+## 🚀 Live Matrix Deployed
+The application is fully hosted on Firebase:
+👉 **[agentic-data-analyticspipeline.web.app](https://agentic-data-analyticspipeline.web.app)**
