@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise AI Analytics Platform</title>
+    <title>Enterprise Data Analytics Operating System</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -15,6 +15,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.12.0/sql-wasm.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Pyodide WebAssembly Python Runtime -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js"></script>
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -31,7 +34,7 @@
                 <div class="sidebar-brand">
                     <i data-lucide="shield-check" class="brand-icon neon-text-blue"></i>
                     <div class="brand-text">
-                        <h2 class="neon-text-blue">PLATFORM_AI</h2>
+                        <h2 class="neon-text-blue">EAOS_PLATFORM</h2>
                         <span>ENTERPRISE HUB</span>
                     </div>
                 </div>
@@ -42,14 +45,23 @@
                     <button class="menu-item" onclick="switchTab('cleaning', this)">
                         <i data-lucide="sparkles"></i> <span>Cleaning & Quality</span>
                     </button>
+                    <button class="menu-item" onclick="switchTab('etl', this)">
+                        <i data-lucide="git-branch"></i> <span>ETL Studio</span>
+                    </button>
                     <button class="menu-item" onclick="switchTab('eda', this)">
                         <i data-lucide="bar-chart-2"></i> <span>Interactive EDA</span>
                     </button>
                     <button class="menu-item" onclick="switchTab('sql', this)">
-                        <i data-lucide="terminal"></i> <span>SQL Playground</span>
+                        <i data-lucide="terminal"></i> <span>SQL Studio</span>
                     </button>
-                    <button class="menu-item" onclick="switchTab('powerbi', this)">
-                        <i data-lucide="box"></i> <span>Power BI Specs</span>
+                    <button class="menu-item" onclick="switchTab('notebook', this)">
+                        <i data-lucide="book-open"></i> <span>Python Notebook</span>
+                    </button>
+                    <button class="menu-item" onclick="switchTab('ml', this)">
+                        <i data-lucide="cpu"></i> <span>Machine Learning</span>
+                    </button>
+                    <button class="menu-item" onclick="switchTab('bi', this)">
+                        <i data-lucide="layout"></i> <span>BI Worksheet</span>
                     </button>
                     <button class="menu-item" onclick="switchTab('ai-copilot', this)">
                         <i data-lucide="message-square"></i> <span>AI Copilot</span>
@@ -60,7 +72,7 @@
                 </nav>
                 <div class="sidebar-footer">
                     <div class="status-indicator">
-                        <span class="pulse"></span>
+                        <span class="pulse" id="status-pulse-dot"></span>
                         <span class="status-text font-mono" id="db-status-label">SQL_DB: IN_MEMORY</span>
                     </div>
                 </div>
@@ -235,6 +247,41 @@
                     </div>
                 </div>
 
+                <!-- TAB: ETL STUDIO -->
+                <div id="tab-etl" class="tab-content">
+                    <div class="split-section animate-fade" style="grid-template-columns: 280px 1fr; gap: 1.25rem;">
+                        <!-- ETL Nodes Toolbox -->
+                        <section class="content-card" style="display: flex; flex-direction: column;">
+                            <div class="card-header">
+                                <h2>ETL Operators</h2>
+                            </div>
+                            <div class="etl-toolbox-items" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div class="toolbox-node-drag" style="padding: 0.75rem; border: 1px dashed var(--border-color); border-radius: 8px; cursor: grab; background: rgba(255,255,255,0.02);" onclick="addETLNode('Source')"><i data-lucide="database" style="width:14px;height:14px;vertical-align:middle;margin-right:6px;color:#818cf8;"></i> Data Source Node</div>
+                                <div class="toolbox-node-drag" style="padding: 0.75rem; border: 1px dashed var(--border-color); border-radius: 8px; cursor: grab; background: rgba(255,255,255,0.02);" onclick="addETLNode('Filter')"><i data-lucide="filter" style="width:14px;height:14px;vertical-align:middle;margin-right:6px;color:#fbbf24;"></i> Data Filter Node</div>
+                                <div class="toolbox-node-drag" style="padding: 0.75rem; border: 1px dashed var(--border-color); border-radius: 8px; cursor: grab; background: rgba(255,255,255,0.02);" onclick="addETLNode('Aggregator')"><i data-lucide="sigma" style="width:14px;height:14px;vertical-align:middle;margin-right:6px;color:#10b981;"></i> Aggregations Node</div>
+                                <div class="toolbox-node-drag" style="padding: 0.75rem; border: 1px dashed var(--border-color); border-radius: 8px; cursor: grab; background: rgba(255,255,255,0.02);" onclick="addETLNode('Export')"><i data-lucide="file-output" style="width:14px;height:14px;vertical-align:middle;margin-right:6px;color:#6366f1;"></i> Data Export Node</div>
+                            </div>
+                            <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                                <button class="btn btn-primary" style="width: 100%;" onclick="runETLPipeline()">Run Workflow</button>
+                            </div>
+                        </section>
+
+                        <!-- ETL Canvas -->
+                        <section class="content-card" style="display: flex; flex-direction: column; min-height: 480px; position: relative;">
+                            <div class="card-header">
+                                <h2>No-Code Workflow Canvas</h2>
+                                <button class="btn btn-secondary" onclick="clearETLCanvas()">Clear Canvas</button>
+                            </div>
+                            <div id="etl-canvas-viewport" style="flex-grow: 1; background: #04070d; border-radius: 12px; border: 1px solid var(--border-color); position: relative; overflow: hidden; min-height: 380px;">
+                                <!-- Nodes rendered dynamically -->
+                                <div style="position: absolute; top:50%; left:50%; transform:translate(-50%, -50%); color: var(--text-muted); font-size: 0.85rem;" id="etl-empty-state-label">
+                                    Click elements on left panel to insert workflow node operators.
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
                 <!-- TAB: INTERACTIVE EDA -->
                 <div id="tab-eda" class="tab-content">
                     <section class="charts-gallery animate-fade">
@@ -276,7 +323,7 @@
                     </section>
                 </div>
 
-                <!-- TAB: SQL PLAYGROUND -->
+                <!-- TAB: SQL STUDIO -->
                 <div id="tab-sql" class="tab-content">
                     <div class="split-section animate-fade" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                         <!-- SQL Editor -->
@@ -321,6 +368,155 @@ ORDER BY total_sales DESC;</textarea>
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- TAB: PYTHON NOTEBOOK -->
+                <div id="tab-notebook" class="tab-content">
+                    <div class="split-section animate-fade" style="grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <!-- Code Cell inputs -->
+                        <section class="content-card" style="display: flex; flex-direction: column; min-height: 480px;">
+                            <div class="card-header">
+                                <h2>Interactive Python Notebook (Pyodide WASM)</h2>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <span id="notebook-status-indicator" style="font-size: 0.75rem; color: var(--text-secondary); margin-right: 4px;" class="font-mono">Loading Runtime...</span>
+                                    <button class="btn btn-primary" onclick="runPythonNotebookCell()"><i data-lucide="play" style="width: 14px; height: 14px;"></i> Run Cell</button>
+                                </div>
+                            </div>
+                            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
+                                    The active dataset is pre-loaded inside Pyodide as a Pandas DataFrame named <code>df</code>.
+                                </div>
+                                <textarea id="notebook-code-editor" style="width: 100%; flex-grow: 1; min-height: 250px; background: #05080e; border: 1px solid var(--border-color); border-radius: 8px; color: #34d399; padding: 1rem; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; outline: none; resize: none;"># Verify loaded DataFrame
+import pandas as pd
+print("DataFrame Shape:", df.shape)
+print("\nDataFrame Columns:\n", df.dtypes)
+print("\nSales statistics:\n", df['sales'].describe())
+</textarea>
+                            </div>
+                        </section>
+
+                        <!-- Cell execution console -->
+                        <section class="content-card" style="display: flex; flex-direction: column; min-height: 480px;">
+                            <div class="card-header">
+                                <h2>Notebook stdout Console</h2>
+                            </div>
+                            <div id="notebook-console-output" style="flex-grow: 1; background: #030508; border: 1px solid var(--border-color); border-radius: 8px; color: #f8fafc; padding: 1rem; font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; overflow-y: auto; white-space: pre-wrap; min-height: 300px;">
+Console initialized. Waiting for execution...
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- TAB: MACHINE LEARNING -->
+                <div id="tab-ml" class="tab-content">
+                    <div class="split-section animate-fade" style="grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <!-- AutoML configuration -->
+                        <section class="content-card" style="display: flex; flex-direction: column; min-height: 480px;">
+                            <div class="card-header">
+                                <h2>AutoML Training Studio</h2>
+                                <button class="btn btn-primary" onclick="runAutoMLTraining()">Train Model</button>
+                            </div>
+                            <div class="ml-setup-parameters" style="display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1rem;">
+                                <div class="filter-group" style="flex-direction: column; align-items: flex-start; gap: 0.4rem;">
+                                    <label style="font-size:0.85rem; color: var(--text-primary);">Target Variable (Y)</label>
+                                    <select id="ml-target-select" style="width: 100%;">
+                                        <option value="profit">profit</option>
+                                        <option value="sales">sales</option>
+                                        <option value="quantity">quantity</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group" style="flex-direction: column; align-items: flex-start; gap: 0.4rem;">
+                                    <label style="font-size:0.85rem; color: var(--text-primary);">Predictor Variables (X)</label>
+                                    <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+                                        <label><input type="checkbox" checked disabled> sales</label>
+                                        <label><input type="checkbox" checked disabled> quantity</label>
+                                        <label><input type="checkbox" checked id="ml-feat-cat"> category (Encoded)</label>
+                                        <label><input type="checkbox" checked id="ml-feat-region"> region (Encoded)</label>
+                                    </div>
+                                </div>
+                                <div class="filter-group" style="flex-direction: column; align-items: flex-start; gap: 0.4rem;">
+                                    <label style="font-size:0.85rem; color: var(--text-primary);">Algorithm</label>
+                                    <select id="ml-algo-select" style="width: 100%;">
+                                        <option value="linear">Linear Regression (Ordinary Least Squares)</option>
+                                        <option value="ridge">Ridge Regression (L2 Penalty)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Training metrics dashboard -->
+                        <section class="content-card" style="display: flex; flex-direction: column; min-height: 480px;">
+                            <div class="card-header">
+                                <h2>Regression Model Metrics</h2>
+                                <span class="badge" id="ml-model-status">Untrained</span>
+                            </div>
+                            <div class="ml-metrics-details" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; flex-grow: 1;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                                    <span>Mean Absolute Error (MAE):</span>
+                                    <strong id="ml-metric-mae" class="font-mono">N/A</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                                    <span>Root Mean Squared Error (RMSE):</span>
+                                    <strong id="ml-metric-rmse" class="font-mono">N/A</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                                    <span>R-squared Score (R²):</span>
+                                    <strong id="ml-metric-r2" class="font-mono">N/A</strong>
+                                </div>
+                                <div style="margin-top: 1.5rem;">
+                                    <h4 style="font-size: 0.85rem; color: var(--text-primary); margin-bottom: 0.5rem;">Feature Coefficients Importance</h4>
+                                    <div id="ml-coefficients-display" class="font-mono" style="font-size:0.8rem; background: rgba(0,0,0,0.15); padding: 1rem; border-radius: 8px; min-height: 100px;">
+                                        Train a regression model to inspect coefficients...
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- TAB: BI WORKSHEET -->
+                <div id="tab-bi" class="tab-content">
+                    <div class="split-section animate-fade" style="grid-template-columns: 280px 1fr; gap: 1.25rem;">
+                        <!-- Dimension Columns Mapper -->
+                        <section class="content-card" style="display: flex; flex-direction: column;">
+                            <div class="card-header">
+                                <h2>Fields & DAX</h2>
+                            </div>
+                            <div class="dax-form" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem;">
+                                <div class="filter-group" style="flex-direction: column; align-items: flex-start; gap: 0.35rem;">
+                                    <label style="font-size:0.8rem; font-weight:700;">Dimension X-Axis</label>
+                                    <select id="bi-dim-select" style="width: 100%;" onchange="runBIWorksheetRenderer()">
+                                        <option value="category">Category</option>
+                                        <option value="sub_category">Sub-Category</option>
+                                        <option value="region">Region</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group" style="flex-direction: column; align-items: flex-start; gap: 0.35rem;">
+                                    <label style="font-size:0.8rem; font-weight:700;">Calculated Value Y-Axis</label>
+                                    <select id="bi-val-select" style="width: 100%;" onchange="runBIWorksheetRenderer()">
+                                        <option value="sales">SUM(sales)</option>
+                                        <option value="profit">SUM(profit)</option>
+                                        <option value="quantity">SUM(quantity)</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group" style="flex-direction: column; align-items: flex-start; gap: 0.35rem; margin-top: 1rem;">
+                                    <label style="font-size:0.8rem; font-weight:700;">DAX Calculated Column</label>
+                                    <input type="text" id="bi-dax-editor" style="width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); color: white; padding: 0.5rem; border-radius: 6px; font-family: monospace; font-size: 0.8rem;" value="ProfitabilityRatio = DIVIDE([Total Profit], [Total Sales], 0)">
+                                    <button class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; font-size:0.75rem;" onclick="applyDAXCalculatedColumn()">Apply DAX Column</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- BI Worksheet Canvas -->
+                        <section class="content-card" style="display: flex; flex-direction: column; min-height: 480px;">
+                            <div class="card-header">
+                                <h2>Dynamic BI Visualization Worksheet</h2>
+                            </div>
+                            <div id="bi-worksheet-chart-container" style="flex-grow: 1; background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border-color); min-height: 380px;">
+                                <!-- Rendered dynamically -->
                             </div>
                         </section>
                     </div>
